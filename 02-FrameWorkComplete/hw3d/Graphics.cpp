@@ -101,6 +101,8 @@ void Graphics::DrawTriangle()
 {
 	HRESULT hr;
 
+#pragma region Vertex Buffer
+
 	struct Vertex
 	{
 		float x;
@@ -110,12 +112,16 @@ void Graphics::DrawTriangle()
 		unsigned char b;
 		unsigned char a;
 	};
-	
+
 	const Vertex vertices[] =
 	{
 		{  0.0f,  0.5f,  255,  0,  0,  0},
 		{  0.5f, -0.5f,  0,  255,  0,  0},
-		{ -0.5f, -0.5f,  0,  0,  255,  0}
+		{ -0.5f, -0.5f,  0,  0,  255,  0},
+		{ -0.3f,  0.3f,  0,  255,  0,  0},
+		{  0.3f,  0.3f,  0,   0, 255,  0},
+		{  0.0f, -0.8f,  255, 0,   0,  0}
+
 	};
 
 	// Declare a Vertex Buffer
@@ -144,6 +150,44 @@ void Graphics::DrawTriangle()
 	const UINT offset = 0u;
 	pContext->IASetVertexBuffers(0u,1u,pVertexBuffer.GetAddressOf(),&stride,&offset);
 
+#pragma endregion
+
+#pragma region Index Buffer
+
+	const unsigned short indices[] =
+	{
+		0,1,2,
+		0,2,3,
+		0,4,1,
+		2,1,5
+	};
+
+	// create index buffer
+	Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;
+
+	// description
+	D3D11_BUFFER_DESC indexBufferDesc;
+	ZeroMemory(&indexBufferDesc, sizeof(D3D11_BUFFER_DESC));
+	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	indexBufferDesc.CPUAccessFlags = 0;
+	indexBufferDesc.MiscFlags = 0;
+	indexBufferDesc.ByteWidth = sizeof(indices);
+	indexBufferDesc.StructureByteStride = sizeof(unsigned short);
+
+	// Create Sub Resource Data
+	D3D11_SUBRESOURCE_DATA srd2;
+	ZeroMemory(&srd2, sizeof(D3D11_SUBRESOURCE_DATA));
+	srd2.pSysMem = indices;
+
+	// Create the Index Buffer
+	GFX_THROW_INFO(pDevice->CreateBuffer(&indexBufferDesc, &srd2, &pIndexBuffer));
+
+
+	pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+#pragma endregion
+
+	
 
 	// create vertex shader
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
@@ -191,7 +235,7 @@ void Graphics::DrawTriangle()
 	pContext->RSSetViewports(1u, &vp);
 
 	// Draw 
-	pContext->Draw((UINT)std::size(vertices), 0u);
+	pContext->DrawIndexed((UINT)std::size(indices),0,0);
 }
 
 // Graphics exception stuff
