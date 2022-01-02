@@ -23,6 +23,7 @@ void App::DoFrame()
 {
 	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
 	const float d = sin(timer.Peek() * 0.5f) / 2.0f + 0.5f;
-	wnd.gfx->ClearBuffer(c * 1.0f, d*1.0f, (1-c)*1.0f);
-	wnd.gfx->EndFrame();
+	wnd.Gfx().ClearBuffer(c * 1.0f, d*1.0f, (1-c)*1.0f);
+	wnd.Gfx().DrawTriangle();
+	wnd.Gfx().EndFrame();
 }
