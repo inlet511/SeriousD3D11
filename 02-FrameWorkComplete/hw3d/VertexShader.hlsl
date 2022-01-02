@@ -1,4 +1,13 @@
-float4 main( float2 pos : POSITION ) : SV_POSITION
+struct v2f
 {
-    return float4(pos, 0, 1.0f);
+    float3 color : COLOR;
+    float4 pos : SV_Position;
+};
+
+v2f main( float2 pos : POSITION , float3 color : COLOR)
+{
+    v2f o;
+    o.pos = float4(pos, 0, 1.0f);
+    o.color = color;
+    return o;
 }
